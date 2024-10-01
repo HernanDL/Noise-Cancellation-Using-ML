@@ -1,202 +1,121 @@
-### README: Noise Cancellation Using Generative AI
+# Wav2Vec2 for Noise Cancellation (Waveform Inversion)
 
----
+This project demonstrates how to fine-tune the **Wav2Vec2** model from Hugging Face for the task of **noise cancellation through waveform inversion**. The model learns to generate the inverse (phase-shifted) version of an input signal, so that when the original input and the generated inverse are combined, the result is **silence** due to destructive interference.
 
-# Noise Cancellation Using Generative AI
+## Goal
+The goal of this project is to train a machine learning model that can:
+- Take a noisy input signal (e.g., `.wav` file).
+- Generate an **inverse waveform** that, when added to the original signal, produces a flat, silent output.
 
-This project aims to develop a noise cancellation system using a Generative Adversarial Network (GAN). The goal is to take a noisy audio file as input, generate the inverse waveform, and combine the two signals to achieve noise cancellation (i.e., producing silence). The project is implemented in Python, using libraries like `PyTorch`, `Librosa`, and `Matplotlib`, and includes the option for API integration (e.g., OpenAI or Google AI) for advanced audio processing.
+This is useful for applications where you want to cancel out unwanted noise or signals using phase-shifted waveforms.
 
----
+## Model: Wav2Vec2
+- **Pre-trained Model**: Wav2Vec2 (`facebook/wav2vec2-base-960h`), which was originally designed for speech recognition tasks.
+- **Fine-tuning Task**: Instead of speech recognition, the model is fine-tuned to generate the inverse of the input audio signal (180° phase shift).
 
-## Project Overview
-
-- **Input**: Noisy audio waveform (`.wav` format).
-- **Output**: Predicted inverse audio waveform that cancels the noise.
-- **Model**: Generative Adversarial Network (GAN) consisting of a Generator and Discriminator.
-- **Libraries**: `PyTorch`, `Librosa`, `Matplotlib`, `SoundFile`, `NumPy`, `TensorFlow`.
-- **Visualization**: Plot audio waveforms and spectrograms to illustrate noise cancellation results.
-
----
-
-## Features
-
-- **Noise Cancellation**: Generates an inverse waveform for any noisy audio signal.
-- **GAN Architecture**: 
-  - Generator: Learns to generate the inverse waveform.
-  - Discriminator: Helps improve the quality of the inverse waveform by distinguishing between real and generated samples.
-- **Audio Processing**: Uses `Librosa` for loading audio files and converting waveforms to spectrograms for model input.
-- **Training and Inference**: The notebook provides a comprehensive training loop and inference mechanism.
-- **External API Integration**: Supports external APIs like OpenAI or Google AI to offload audio processing to cloud-based services.
-- **Visualization**: Audio waveforms and spectrograms are plotted using `matplotlib` for easy inspection of the results.
-
----
-
-## Getting Started
-
-### Prerequisites
-
-Ensure you have the following software and libraries installed:
-
-- Python 3.x
-- Jupyter Notebook
-- The following Python packages (can be installed via `pip`):
-  - `numpy`
-  - `scipy`
-  - `librosa`
-  - `soundfile`
-  - `matplotlib`
-  - `torch`
-  - `torchaudio`
-  - `tensorflow` (optional if you prefer PyTorch)
+## Key Features
+- **Waveform Cancellation**: The model learns to generate the inverse waveform to cancel the original input.
+- **Silence as Output**: When the predicted inverse signal is added to the original, the output is silence (destructive interference).
+- **Visualizations**: Plots are provided to visualize the input signal, the inverse waveform, and the combined result.
+- **Custom Dataset**: You can upload your own noisy audio dataset for training.
   
-### Installation
+## Project Structure
+- **Colab Notebook**: The core implementation is written as a Jupyter Notebook designed to run on Google Colab.
+- **Fine-Tuning**: Wav2Vec2 is fine-tuned on a custom dataset where the model learns to invert the input signal.
+- **Inference**: After fine-tuning, the model can generate inverse waveforms for any new noisy input.
 
-1. Clone the repository to your local machine:
+## Prerequisites
+
+To run this project, you'll need:
+- Python 3.x
+- Google Colab (or a local Jupyter environment)
+- Libraries:
+  - Hugging Face's `transformers`
+  - `datasets`
+  - `librosa` for audio processing
+  - `torch` for deep learning
+
+In Google Colab, the required libraries will be installed automatically by the notebook.
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/your-username/wav2vec2-noise-cancellation.git
+cd wav2vec2-noise-cancellation
+
+You can also copy the code from the provided Colab notebook and run it in your own environment.
+
+## Running the Notebook in Google Colab
+
+1. Open the Colab notebook (`wav2vec2_noise_cancellation.ipynb`) in Google Colab.
+2. Install the required libraries using the following command:
    ```bash
-   git clone https://github.com/your_username/noise-cancellation-ai.git
-   cd noise-cancellation-ai
+   !pip install transformers datasets librosa soundfile torch torchaudio
    ```
-
-2. Install the required dependencies:
-   ```bash
-   pip install numpy scipy librosa soundfile matplotlib torch torchaudio tensorflow
-   ```
-
-3. Open the Jupyter notebook:
-   ```bash
-   jupyter notebook noise_cancellation.ipynb
-   ```
-
----
+3. Upload your noisy `.wav` audio file when prompted.
+4. The notebook will fine-tune the Wav2Vec2 model to generate the inverse waveform for your noisy input.
+5. After training, you can visualize the results and see how the input and inverse signals combine to form silence.
 
 ## Usage
 
-### Step-by-Step Guide
+### 1. Upload Noisy Audio
+Upload your noisy `.wav` audio file when prompted in the notebook. The file will be used as the input signal for training and inference.
 
-1. **Load Audio**: Use `librosa` to load a noisy audio file in `.wav` format. You can replace `path_to_wav_file.wav` with your own file.
-   
-2. **Convert to Spectrogram**: Convert the waveform to a spectrogram using the Short-Time Fourier Transform (STFT). This makes the audio data suitable for the neural network.
+### 2. Fine-Tuning
+The model will be fine-tuned to predict the inverse waveform (180-degree phase-shifted) of the input signal. This inverse signal is generated to cancel out the input signal.
 
-3. **GAN Training**: Train the GAN model to predict the inverse waveform. The generator attempts to create the inverse waveform while the discriminator ensures that the generated waveform is close to the real inverse.
+### 3. Inference
+Once fine-tuning is complete, you can run inference on any noisy input signal. The output will be the inverse waveform, which when combined with the original, will result in silence.
 
-4. **Inference**: After training, use the generator to create the inverse waveform for any new input audio and visualize the noise cancellation by plotting the original and combined waveforms.
+### 4. Visualization
+The notebook provides visualizations to help you understand the process:
+- **Input Signal**: The original noisy signal.
+- **Inverse Signal**: The model-generated inverse waveform.
+- **Combined Signal**: The combination of input and inverse signals, which should approach silence.
 
-5. **Optional API Integration**: Optionally, you can integrate external APIs such as OpenAI or Google AI for additional audio processing services.
+## Training Process
 
----
+The training process involves fine-tuning Wav2Vec2 using the following steps:
+1. **Preprocessing**: Tokenize the noisy input and generate the inverse waveform as the target.
+2. **Model Training**: The Wav2Vec2 model is trained to predict the inverse waveform that cancels out the input.
+3. **Evaluation**: After training, the model's ability to produce accurate inverse waveforms is evaluated.
 
-### Sample Code Snippets
+## Results
 
-#### Load and Visualize Audio
-```python
-audio, sr = load_audio('path_to_wav_file.wav')
-plot_waveform(audio, sr)
-```
+- **Input Audio**: A noisy input audio signal is provided.
+- **Inverse Audio**: The model generates an inverse waveform, which is 180° out of phase with the input.
+- **Combined Audio**: When the input and inverse audio signals are added together, the result is a silent waveform.
 
-#### Convert to Spectrogram
-```python
-spectrogram = audio_to_spectrogram(audio, sr)
-plot_spectrogram(spectrogram, sr)
-```
+## Future Work
 
-#### GAN Training
-```python
-train(generator, discriminator, data_loader, optimizer_G, optimizer_D, criterion, num_epochs=100)
-```
-
-#### Inference and Visualization
-```python
-inverse_waveform = spectrogram_to_audio(generator(spectrogram), sr)
-combined_waveform = audio + inverse_waveform
-plot_waveform(combined_waveform, sr)
-```
-
----
-
-## External API Integration (Optional)
-
-If you'd like to use external APIs for noise cancellation, you can integrate services such as OpenAI or Google AI. Here's an example of how to send the audio data to an API:
-
-```python
-import openai
-
-def call_openai_audio_model(audio):
-    response = openai.Audio.create(audio_file=audio, ...)
-    return response['output_audio']
-
-# Example usage
-output_audio = call_openai_audio_model('path_to_noisy_audio.wav')
-```
-
----
-
-## Visualization
-
-The notebook provides visualizations of:
-- **Waveforms**: Before and after noise cancellation.
-- **Spectrograms**: To illustrate how the frequencies change across time.
-
----
+- **Real-time Processing**: Extend the model to handle real-time noise cancellation applications.
+- **Model Optimization**: Improve the model architecture for faster and more efficient waveform inversion.
+- **Diverse Noise Types**: Fine-tune the model on a variety of noise types to generalize across different audio environments.
 
 ## Contributing
 
-If you would like to contribute to this project, please follow these steps:
-
+Contributions are welcome! If you'd like to contribute:
 1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/your-feature`).
-3. Make your changes and commit them (`git commit -am 'Add new feature'`).
-4. Push to the branch (`git push origin feature/your-feature`).
-5. Open a Pull Request.
-
----
+2. Create a new branch for your feature or bug fix.
+3. Commit your changes.
+4. Submit a Pull Request with a detailed description of the changes.
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
----
+## Acknowledgements
 
-## Future Work
+- Hugging Face's `transformers` library for making Wav2Vec2 easily accessible.
+- Google Colab for providing free GPU resources for training models.
+- Librosa for audio processing utilities.
 
-- **Improve Model Architecture**: Experiment with other generative models like VAEs (Variational Autoencoders) for noise cancellation.
-- **Real-Time Processing**: Extend the model to handle real-time audio streaming for live noise cancellation.
-- **API Integration**: Further develop the integration with external APIs for more complex audio processing scenarios.
-- **Model Optimization**: Fine-tune the model for better performance with different types of noise (e.g., white noise, background chatter).
+### Key Points in the README:
 
----
-
-## References
-
-- [Librosa Documentation](https://librosa.org/doc/latest/index.html)
-- [PyTorch Documentation](https://pytorch.org/docs/stable/index.html)
-- [GANs in PyTorch](https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html)
-- [OpenAI API Documentation](https://beta.openai.com/docs/)
-
----
-
-## Contact
-
-For any questions or issues, please feel free to open an issue on GitHub or contact me at hdelahitte@gmail.com
-
----
-
-### Example Visualizations
-
-Original Waveform:
-
-![Original Waveform](images/original_waveform.png)
-
-Combined Waveform (After Noise Cancellation):
-
-![Combined Waveform](images/combined_waveform.png)
-
----
-
-### Acknowledgements
-
-Special thanks to all the open-source libraries and frameworks that made this project possible!
-
----
-
-**Happy Coding! 🎧🚀**
+- **Project Overview**: Briefly explains the goal of waveform cancellation using Wav2Vec2.
+- **Installation Instructions**: Steps for cloning the repo and running the notebook in Google Colab.
+- **Detailed Usage**: Steps for using the notebook, including uploading audio, fine-tuning the model, running inference, and visualizing the results.
+- **Future Work**: Suggestions for future improvements, including real-time noise cancellation and support for diverse noise types.
 
