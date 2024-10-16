@@ -95,6 +95,96 @@ The results are visualized through plots:
 
 The effectiveness of the TCN model can vary depending on factors such as sequence length, noise complexity, and training data diversity.
 
+
+## Future Steps
+#### 1. Implementing Real-time Predictions
+To extend the current noise cancellation approach for **real-time predictions** and anti-noise generation, the following steps are proposed:
+
+- **Stream Processing**: 
+  - Use libraries like **PyAudio** or **SoundDevice** for real-time audio streaming.
+  - Continuously capture small audio frames (e.g., 50 ms chunks).
+  - Pre-process each frame and use the trained TCN model to predict the inverted phase in real-time.
+  
+- **Low-latency Model Optimization**: 
+  - Use techniques like **model quantization** and **TensorFlow Lite** to reduce the model's size and speed up inference.
+  - Convert the trained model into a **TensorFlow Lite** model for use on mobile devices or embedded systems.
+  
+- **On-device Inference**: 
+  - Perform inference directly on an edge device (e.g., a smartphone or Raspberry Pi) to minimize the latency associated with sending data back and forth between the device and a server.
+  - Implement efficient buffering mechanisms to handle overlapping audio frames for smooth transitions between predictions.
+  
+- **Feedback Loop for Adjustment**: 
+  - Integrate a feedback loop that adjusts the phase prediction based on real-time error measurements (i.e., residual noise that remains after cancellation).
+  - Use this feedback to fine-tune the prediction model on-the-fly, optimizing it for the specific noise environment.
+
+#### 2. Real-time Anti-noise Generation
+To produce real-time anti-noise, the following approach can be taken:
+
+- **Audio Output Synchronization**: 
+  - Ensure that the predicted anti-noise signal is output with minimal latency, synchronized with the incoming audio.
+  - Use libraries like **PortAudio** to handle low-latency audio playback, ensuring that the anti-noise signal is played in sync with the input noise.
+
+- **Adaptive Noise Cancellation (ANC)**:
+  - Implement an adaptive filter, such as a **LMS (Least Mean Squares)** or **RLS (Recursive Least Squares)** filter, to refine the output in real-time.
+  - The adaptive filter can be trained to further reduce any residual noise that remains after the TCN-based inversion.
+
+- **Streaming Model Update**: 
+  - Use a **streaming TCN** implementation that can update its weights based on incoming data without needing full retraining.
+  - This will allow the model to adapt to changes in the noise environment as they occur, making it more effective for dynamic conditions.
+
+### Phone App Proposal
+To create a phone application capable of recording noise, analyzing it, and generating anti-noise in real-time, consider the following components and architecture:
+
+#### 1. App Functionality Overview
+- **Noise Recording**: 
+  - Use the phone's microphone to record a short sample of the ambient noise.
+  - Pre-process the audio for model inference (normalize and extract features).
+  
+- **Noise Analysis**: 
+  - Run a **pre-trained TCN model** or a lighter version of the model on the phone to analyze the recorded noise sample.
+  - Provide an option to view the waveform and frequency spectrum of the noise.
+
+- **Anti-noise Generation**: 
+  - Use the model's output to create a phase-inverted signal.
+  - Play the inverted signal through the phone's speakers to cancel out the noise.
+  - Continuously monitor the environment for changes in noise and adjust the anti-noise output dynamically.
+
+#### 2. Technical Architecture
+- **Front-end (UI/UX)**:
+  - Build a **React Native** or **Flutter** application for cross-platform support (Android & iOS).
+  - Create an intuitive interface with features such as a real-time spectrogram, start/stop recording buttons, and noise cancellation indicators.
+  
+- **Model Inference (On-device)**:
+  - Convert the TCN model to **TensorFlow Lite** and integrate it into the app.
+  - Use libraries like **TFLite Interpreter** to perform real-time predictions on audio input.
+  - Store the pre-trained model locally on the device for offline functionality.
+
+- **Real-time Audio Processing**:
+  - Use **AudioRecord** (Android) or **AVAudioEngine** (iOS) for capturing real-time audio streams.
+  - Use **PortAudio** for low-latency audio playback to output the generated anti-noise signal.
+  - Implement a circular buffer to manage real-time audio input and prediction output.
+
+#### 3. Additional Features
+- **Auto-calibration**: 
+  - Allow the app to perform an initial calibration in different noise environments, adjusting the model’s prediction parameters for better performance.
+  
+- **Noise History and Analysis**: 
+  - Store audio samples for later analysis and track the app's performance over time.
+  - Visualize changes in noise levels using graphs and dB readings.
+
+- **Cloud Backup & Training**:
+  - Provide an option to upload noise samples to the cloud for further model training.
+  - Use the collected data to improve the TCN model over time with additional training on a server-side infrastructure.
+
+#### 4. Challenges and Considerations
+- **Latency**: The biggest challenge in implementing real-time noise cancellation is maintaining extremely low latency between recording and playback.
+- **Battery Consumption**: Real-time audio processing is power-intensive. Efficient audio streaming and model inference are critical for maintaining battery life.
+- **Speaker-Microphone Distance**: The effectiveness of the phase inversion method depends on the relative distance between the phone's speakers and microphone, as it impacts how the anti-noise and original noise combine.
+
+### Summary
+This repository provides a foundation for implementing noise cancellation using phase inversion with a TCN model. With future steps focusing on real-time predictions and on-device capabilities, the solution can evolve into a practical, real-world application. The proposed mobile app could empower users to minimize unwanted noise using their smartphones, adapting dynamically to various noise environments.
+
+
 ## Contributing
 Contributions are welcome! If you have ideas for improvements, feel free to fork the repository, create a feature branch, and submit a pull request.
 
