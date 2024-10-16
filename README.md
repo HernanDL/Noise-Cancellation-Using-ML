@@ -1,121 +1,108 @@
-# Wav2Vec2 for Noise Cancellation (Waveform Inversion)
+Here is a `README.md` file for your GitHub repository, which includes a comprehensive description of noise cancellation using phase inversion and the rationale behind selecting a Temporal Convolutional Network (TCN) for this task:
 
-This project demonstrates how to fine-tune the **Wav2Vec2** model from Hugging Face for the task of **noise cancellation through waveform inversion**. The model learns to generate the inverse (phase-shifted) version of an input signal, so that when the original input and the generated inverse are combined, the result is **silence** due to destructive interference.
+---
 
-## Goal
-The goal of this project is to train a machine learning model that can:
-- Take a noisy input signal (e.g., `.wav` file).
-- Generate an **inverse waveform** that, when added to the original signal, produces a flat, silent output.
+# TCN-based Urban Noise Prediction and Cancellation
 
-This is useful for applications where you want to cancel out unwanted noise or signals using phase-shifted waveforms.
+## Overview
+This repository implements a **Temporal Convolutional Network (TCN)** for predicting and canceling urban noise through phase inversion. It is designed to handle complex noise patterns typically found in urban environments, such as machinery, engines, and constant background hums. By predicting the inverted phase of the noise, the model can effectively reduce or cancel out unwanted sounds when combined with the original input.
 
-## Model: Wav2Vec2
-- **Pre-trained Model**: Wav2Vec2 (`facebook/wav2vec2-base-960h`), which was originally designed for speech recognition tasks.
-- **Fine-tuning Task**: Instead of speech recognition, the model is fine-tuned to generate the inverse of the input audio signal (180° phase shift).
+## Table of Contents
+1. [Introduction](#introduction)
+2. [How Noise Cancellation Works](#how-noise-cancellation-works)
+3. [Why Use a TCN?](#why-use-a-tcn)
+4. [Getting Started](#getting-started)
+5. [Usage](#usage)
+6. [Results](#results)
+7. [Contributing](#contributing)
+8. [License](#license)
 
-## Key Features
-- **Waveform Cancellation**: The model learns to generate the inverse waveform to cancel the original input.
-- **Silence as Output**: When the predicted inverse signal is added to the original, the output is silence (destructive interference).
-- **Visualizations**: Plots are provided to visualize the input signal, the inverse waveform, and the combined result.
-- **Custom Dataset**: You can upload your own noisy audio dataset for training.
-  
-## Project Structure
-- **Colab Notebook**: The core implementation is written as a Jupyter Notebook designed to run on Google Colab.
-- **Fine-Tuning**: Wav2Vec2 is fine-tuned on a custom dataset where the model learns to invert the input signal.
-- **Inference**: After fine-tuning, the model can generate inverse waveforms for any new noisy input.
+## Introduction
+Urban noise spans a wide frequency range, from **20 Hz** (low hums) to **20,000 Hz** (high-pitched whines). Traditional noise cancellation methods like simple filters may struggle with these diverse patterns. This project aims to address this by using a **machine learning approach** to predict the inverted phase of noise, enabling effective cancellation of complex audio patterns.
 
-## Prerequisites
+The repository contains:
+- A **TCN model** for time-series prediction of urban noise.
+- Functions to **generate synthetic urban noise** for training.
+- Scripts for **training, evaluating, and visualizing** model predictions.
+- Code to **test the model** on real-world audio samples uploaded as WAV files.
 
-To run this project, you'll need:
-- Python 3.x
-- Google Colab (or a local Jupyter environment)
-- Libraries:
-  - Hugging Face's `transformers`
-  - `datasets`
-  - `librosa` for audio processing
-  - `torch` for deep learning
+## How Noise Cancellation Works
+Noise cancellation is achieved through **phase inversion**:
+1. **Phase Inversion**: For a given sound wave, an inverted phase is created. For example, if the original wave has a peak at a particular moment, the inverted wave has a trough at the same moment.
+2. **Summation for Cancellation**: By adding the inverted wave to the original wave, the positive and negative peaks cancel each other out, leading to a reduction or cancellation of the sound.
+3. **Learning the Inversion**: Instead of manually inverting, a machine learning model like a TCN learns to predict the inverse of complex noise patterns, adapting to various types of noise automatically.
 
-In Google Colab, the required libraries will be installed automatically by the notebook.
+This project uses synthetic urban noise for training the TCN, allowing the model to generalize well to various noise patterns.
 
-## Installation
+## Why Use a TCN?
+### Advantages of Temporal Convolutional Networks:
+- **Long-range Temporal Dependencies**: TCNs use **dilated convolutions**, which allow them to capture dependencies over long time spans, making them suitable for audio signal prediction.
+- **Faster Training**: Unlike recurrent models (e.g., LSTM or GRU), TCNs use convolutions, which can leverage parallel processing, leading to faster training times.
+- **Stable Predictions**: TCNs avoid issues like vanishing or exploding gradients, common in RNNs, making them more stable for longer sequences.
+- **Flexibility with Sequence Length**: TCNs can be designed to focus on a specific range of past samples, making them adaptable for different time-series tasks, such as audio signals.
 
-Clone the repository:
+### Why Not CNNs or GANs?
+- **CNNs**: While CNNs are good at extracting features from local time windows, they often struggle with long-range dependencies, which are crucial for modeling the temporal structure of noise.
+- **GANs**: Generative Adversarial Networks can be powerful for generating new samples but may be more complex and slower to train when it comes to learning the nuances of phase inversion.
 
+In this scenario, the TCN strikes a balance between speed, simplicity, and its ability to adapt to the complex structure of urban noise.
+
+## Getting Started
+### Prerequisites
+- Python 3.7 or above
+- Jupyter Notebook or Google Colab for interactive execution
+
+### Required Libraries
 ```bash
-git clone https://github.com/your-username/wav2vec2-noise-cancellation.git
-cd wav2vec2-noise-cancellation
+pip install numpy matplotlib tensorflow librosa
+```
 
-You can also copy the code from the provided Colab notebook and run it in your own environment.
-
-## Running the Notebook in Google Colab
-
-1. Open the Colab notebook (`wav2vec2_noise_cancellation.ipynb`) in Google Colab.
-2. Install the required libraries using the following command:
-   ```bash
-   !pip install transformers datasets librosa soundfile torch torchaudio
-   ```
-3. Upload your noisy `.wav` audio file when prompted.
-4. The notebook will fine-tune the Wav2Vec2 model to generate the inverse waveform for your noisy input.
-5. After training, you can visualize the results and see how the input and inverse signals combine to form silence.
+### Clone the Repository
+```bash
+git clone https://github.com/your-username/TCN-urban-noise-cancellation.git
+cd TCN-urban-noise-cancellation
+```
 
 ## Usage
+1. **Training the Model**: Use the provided notebook to train the TCN model on synthetic noise. Adjust parameters like `sequence_length`, `sample_rate`, and `max_freq` to match your data.
+2. **Testing the Model**: Upload a real-world WAV file to test the model's noise cancellation performance.
+3. **Visualization**: The notebook includes plots for the input waveform, predicted waveform, combined waveform, and residual noise in dB.
 
-### 1. Upload Noisy Audio
-Upload your noisy `.wav` audio file when prompted in the notebook. The file will be used as the input signal for training and inference.
+### Training the Model
+```python
+predictor = WaveformPredictor()
+history = predictor.train()
+```
 
-### 2. Fine-Tuning
-The model will be fine-tuned to predict the inverse waveform (180-degree phase-shifted) of the input signal. This inverse signal is generated to cancel out the input signal.
-
-### 3. Inference
-Once fine-tuning is complete, you can run inference on any noisy input signal. The output will be the inverse waveform, which when combined with the original, will result in silence.
-
-### 4. Visualization
-The notebook provides visualizations to help you understand the process:
-- **Input Signal**: The original noisy signal.
-- **Inverse Signal**: The model-generated inverse waveform.
-- **Combined Signal**: The combination of input and inverse signals, which should approach silence.
-
-## Training Process
-
-The training process involves fine-tuning Wav2Vec2 using the following steps:
-1. **Preprocessing**: Tokenize the noisy input and generate the inverse waveform as the target.
-2. **Model Training**: The Wav2Vec2 model is trained to predict the inverse waveform that cancels out the input.
-3. **Evaluation**: After training, the model's ability to produce accurate inverse waveforms is evaluated.
+### Testing with a Real WAV File
+1. Upload a WAV file in the Colab environment.
+2. Use the following code to load the file and make predictions:
+```python
+uploaded = files.upload()
+file_name = list(uploaded.keys())[0]
+waveform, _ = librosa.load(file_name, sr=predictor.sample_rate)
+predicted_waveform = predictor.predict(waveform)
+combined_waveform = waveform[predictor.sequence_length:] + predicted_waveform
+predictor.plot_results(waveform, predicted_waveform, combined_waveform)
+```
 
 ## Results
+The results are visualized through plots:
+- **Input Waveform**: Visualizes the original urban noise.
+- **Predicted Waveform**: Shows the inverted phase predicted by the TCN.
+- **Combined Waveform**: Illustrates the outcome when the input is added to its inverted phase, highlighting the cancellation effect.
+- **Residual Noise (dB)**: Plots the residual noise in decibels, indicating the effectiveness of the noise cancellation.
 
-- **Input Audio**: A noisy input audio signal is provided.
-- **Inverse Audio**: The model generates an inverse waveform, which is 180° out of phase with the input.
-- **Combined Audio**: When the input and inverse audio signals are added together, the result is a silent waveform.
-
-## Future Work
-
-- **Real-time Processing**: Extend the model to handle real-time noise cancellation applications.
-- **Model Optimization**: Improve the model architecture for faster and more efficient waveform inversion.
-- **Diverse Noise Types**: Fine-tune the model on a variety of noise types to generalize across different audio environments.
+The effectiveness of the TCN model can vary depending on factors such as sequence length, noise complexity, and training data diversity.
 
 ## Contributing
+Contributions are welcome! If you have ideas for improvements, feel free to fork the repository, create a feature branch, and submit a pull request.
 
-Contributions are welcome! If you'd like to contribute:
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix.
-3. Commit your changes.
-4. Submit a Pull Request with a detailed description of the changes.
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/YourFeature`)
+3. Commit your Changes (`git commit -m 'Add some feature'`)
+4. Push to the Branch (`git push origin feature/YourFeature`)
+5. Open a Pull Request
 
 ## License
-
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgements
-
-- Hugging Face's `transformers` library for making Wav2Vec2 easily accessible.
-- Google Colab for providing free GPU resources for training models.
-- Librosa for audio processing utilities.
-
-### Key Points in the README:
-
-- **Project Overview**: Briefly explains the goal of waveform cancellation using Wav2Vec2.
-- **Installation Instructions**: Steps for cloning the repo and running the notebook in Google Colab.
-- **Detailed Usage**: Steps for using the notebook, including uploading audio, fine-tuning the model, running inference, and visualizing the results.
-- **Future Work**: Suggestions for future improvements, including real-time noise cancellation and support for diverse noise types.
-
